@@ -479,6 +479,11 @@ module WorkflowMgr
         offsets << WorkflowMgr.ddhhmmss_to_seconds(taskdepnode.attributes["cycle_offset"]) unless taskdepnode.attributes["cycle_offset"].nil?
       end
 
+      taskvalidnodes=@workflowdoc.find('//taskvalid')
+      taskvalidnodes.each do |taskvalidnode|
+        offsets << WorkflowMgr.ddhhmmss_to_seconds(taskvalidnode.attributes["cycle_offset"]) unless taskvalidnode.attributes["cycle_offset"].nil?
+      end
+
       return offsets.uniq
 
     end
@@ -656,7 +661,10 @@ module WorkflowMgr
 
        task=element.attributes["task"]
 
-       return TaskValidDependency.new(task)
+       # Get the cycle offset, if there is one
+       cycle_offset=WorkflowMgr.ddhhmmss_to_seconds(element.attributes["cycle_offset"]) || 0
+
+       return TaskValidDependency.new(task,cycle_offset)
      end
 
 

@@ -799,8 +799,9 @@ module WorkflowMgr
     # initialize
     #
     #####################################################
-    def initialize(task)
+    def initialize(task,cycle_offset=0)
       @task=task
+      @cycle_offset=cycle_offset
     end
 
     #####################################################
@@ -815,12 +816,15 @@ module WorkflowMgr
 
        checkjob=d.tasks[@task]
 
+       # Determine the cycle to check
+       checkcycle=d.cycle.getgm+@cycle_offset
+
        # Get the mandatory task attribute
        cycle_is_valid=true
        unless checkjob.attributes[:cycledefs].nil?
          taskcycledefs=d.cycledefs.find_all { |cycledef| checkjob.attributes[:cycledefs].split(/[\s,]+/).member?(cycledef.group) }
          # Cycle is invalid for this task if the cycle is not a member of the tasks cycle list
-         unless taskcycledefs.any? { |cycledef| cycledef.member?(d.cycle) }
+         unless taskcycledefs.any? { |cycledef| cycledef.member?(checkcycle) }
            cycle_is_valid=false
          end
        end  # unless
@@ -835,26 +839,27 @@ module WorkflowMgr
     #####################################################
     def query(d)
 
-       # Set the job to check
-
        # Get the jobs for this cycle
-       return [{:dep=>"#{@task}", :msg=>"is not valid", :resolved=>false }] if d.tasks[@task].nil?
+       return [{:dep=>"#{@task} of cycle #{(d.cycle.getgm+@cycle_offset).strftime("%Y%m%d%H%M")}", :msg=>"is not valid", :resolved=>false }] if d.tasks[@task].nil?
 
        checkjob=d.tasks[@task]
+
+       # Determine the cycle to check
+       checkcycle=d.cycle.getgm+@cycle_offset
 
        cycle_is_valid=true
        unless checkjob.attributes[:cycledefs].nil?
          taskcycledefs=d.cycledefs.find_all { |cycledef| checkjob.attributes[:cycledefs].split(/[\s,]+/).member?(cycledef.group) }
          # Cycle is invalid for this task if the cycle is not a member of the tasks cycle list
-         unless taskcycledefs.any? { |cycledef| cycledef.member?(d.cycle) }
+         unless taskcycledefs.any? { |cycledef| cycledef.member?(checkcycle) }
            cycle_is_valid=false
          end
        end  # unless
 
       if cycle_is_valid
-        return [{:dep=>"#{@task}", :msg=>"is valid", :resolved=>true }]
+        return [{:dep=>"#{@task} of cycle #{checkcycle.strftime("%Y%m%d%H%M")}", :msg=>"is valid", :resolved=>true }]
       else
-        return [{:dep=>"#{@task}", :msg=>"is not valid", :resolved=>false }]
+        return [{:dep=>"#{@task} of cycle #{checkcycle.strftime("%Y%m%d%H%M")}", :msg=>"is not valid", :resolved=>false }]
       end
     end
 
