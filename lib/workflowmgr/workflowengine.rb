@@ -62,6 +62,9 @@ module WorkflowMgr
         # Get command line options
         @options=options
 
+        # overwrite all server options to false for the --no-server situation
+        @config.disable_servers! if @options.no_server
+
         # Set up an object to serve the workflow database (but do not open the database)
         @dbServer=DBProxy.new(@config,@options)
 
