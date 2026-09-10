@@ -63,25 +63,43 @@ module WorkflowMgr
 
       # Initialize hashes for this task
       @harvested[task.attributes[:name]] = Hash.new if @harvested[task.attributes[:name]].nil?
-      @running[task.attributes[:name]] = Hash.new if @status[task.attributes[:name]].nil?
+      @running[task.attributes[:name]] = Hash.new if @running[task.attributes[:name]].nil?
       @status[task.attributes[:name]] = Hash.new if @status[task.attributes[:name]].nil?
+
+      # Mark this submission in progress and unharvested BEFORE dispatching to the pool
+      @harvested[task.attributes[:name]][cycle.to_i]=false
+      @running[task.attributes[:name]][cycle.to_i] = true
 
       # Spawn a thread to submit the job
       @pool.process do
 
-        # Initialize submission status to NOT harvested
-        @harvested[task.attributes[:name]][cycle.to_i]=false
-
-        # Mark this job submission in progress
-        @running[task.attributes[:name]][cycle.to_i] = true
-
         # Submit the job
         @status[task.attributes[:name]][cycle.to_i]=@batchsystem.submit(task)
 
+      ensure
         # Mark this job submission as done
         @running[task.attributes[:name]][cycle.to_i] = false
 
       end
+
+    end
+
+
+    ##########################################
+    #
+    # submitting?
+    #
+    ##########################################
+    def submitting?
+
+      # Return true if any job submission is still in progress
+      @running.each_value do |cycles|
+        cycles.each_value do |inprogress|
+          return true if inprogress
+        end
+      end
+
+      return false
 
     end
 

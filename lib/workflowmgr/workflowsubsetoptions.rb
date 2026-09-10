@@ -17,7 +17,7 @@ module WorkflowMgr
 
     require 'workflowmgr/workflowselection'
 
-    attr_reader :database, :workflowdoc, :cycles, :tasks, :metatasks, :verbose, :harvest_only
+    attr_reader :database, :workflowdoc, :cycles, :tasks, :metatasks, :verbose, :harvest_only, :no_server
 
     ##########################################
     #
@@ -33,6 +33,7 @@ module WorkflowMgr
       @all_tasks=false
       @all_cycles=false
       @harvest_only=false
+      @no_server=false
       @selection=nil
       super(args)
 
@@ -98,6 +99,11 @@ module WorkflowMgr
       if @name=='rocotorun'
         opts.on("--harvest-only","Harvest pending submissions without making any changes to the batch system") do
           @harvest_only=true
+        end
+
+        # Run without any server
+        opts.on("--no-server","Run without detached database, batch queue, or workflow IO server processes") do
+          @no_server=true
         end
       end
 

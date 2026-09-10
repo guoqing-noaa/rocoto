@@ -96,6 +96,17 @@ module WorkflowMgr
 
     ##########################################
     #
+    # disable_servers!
+    #
+    ##########################################
+    def disable_servers!
+      # overwrite all server options to false if "--no-server"
+      @config = @config.merge(DatabaseServer: false, BatchQueueServer: false, WorkflowIOServer: false)
+    end
+
+
+    ##########################################
+    #
     # method_missing
     #
     ##########################################
