@@ -868,8 +868,8 @@ module WorkflowMgr
 
       end
 
-      # If we are not using a batch queue server, make sure all qsub threads are terminated before checking for job ids
-      Thread.list.each { |t| t.join unless t==Thread.main } unless @config.BatchQueueServer
+      # If we are not using a batch queue server, wait for all qsub threads to finish before checking for job ids
+      sleep 1 while @bqServer.submitting? unless @config.BatchQueueServer
 
       # Harvest job ids for submitted tasks
       newjobs.each do |job|
