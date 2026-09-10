@@ -76,6 +76,7 @@ module WorkflowMgr
         # Submit the job
         @status[task.attributes[:name]][cycle.to_i]=@batchsystem.submit(task)
 
+      ensure
         # Mark this job submission as done
         @running[task.attributes[:name]][cycle.to_i] = false
 
