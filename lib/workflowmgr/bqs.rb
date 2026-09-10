@@ -63,7 +63,7 @@ module WorkflowMgr
 
       # Initialize hashes for this task
       @harvested[task.attributes[:name]] = Hash.new if @harvested[task.attributes[:name]].nil?
-      @running[task.attributes[:name]] = Hash.new if @status[task.attributes[:name]].nil?
+      @running[task.attributes[:name]] = Hash.new if @running[task.attributes[:name]].nil?
       @status[task.attributes[:name]] = Hash.new if @status[task.attributes[:name]].nil?
 
       # Mark this submission in progress and unharvested BEFORE dispatching to the pool
