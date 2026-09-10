@@ -100,10 +100,8 @@ module WorkflowMgr
     #
     ##########################################
     def disable_servers!
-      # force to run without servers for the --no-server situation 
-      @config[:DatabaseServer]=false
-      @config[:BatchQueueServer]=false
-      @config[:WorkflowIOServer]=false
+      # overwrite all server options to false if "--no-server"
+      @config = @config.merge(DatabaseServer: false, BatchQueueServer: false, WorkflowIOServer: false)
     end
 
 
